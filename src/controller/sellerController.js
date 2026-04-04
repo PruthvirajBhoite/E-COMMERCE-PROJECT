@@ -1,103 +1,95 @@
-import jwtProvider = require("../util/jwtProvider");
+import jwtProvider from "../util/jwtProvider.js";
+import UserRole from "../domain/UserRole.js";
+import SellerService from "../service/SellerService.js";
+import VerificationCode from "../model/VerificationCode.js";
 
-class SellerController{
+class SellerController {
 
-
-    async getSellerProfile(req,res){
+    async getSellerProfile(req, res){
         try{
-            const jwt = req.headers.authorization.split(" ")[1]
-            const seller = await sellerServcie.getSellerProfile(jwt);
-
+            const profile = await req.seller;
+            console.log("profile",profile);
+            
+            const jwt = req.headers.authorization.split(" ")[1];
+            const seller = await SellerService.getSellerProfile(jwt);
             res.status(200).json(seller);
-
         }catch(error){
-          res.status(error instanceof Error ? 404:500)
-          .json({message:error.message})
+            res.status(error instanceof Error ? 400 : 500).json({message:error.message});
         }
     }
-     async createSeller(req,res){
+
+    async createSeller(req,res){
         try{
-            const seller = await sellerServcie.createSeller(req.body);
-
-            res.status(200).json({message:"seller created sucessfully "});
-
+            await SellerService.createSeller(req.body);
+            res.status(200).json({message:"Seller created successfully"});
         }catch(error){
-          res.status(error instanceof Error ? 404:500)
-          .json({message:error.message})
+            res.status(error instanceof Error ? 400 : 500).json({message:error.message});
         }
     }
+
     async getAllSeller(req,res){
         try{
-            const status = req.query.status
-            const seller = await sellerServcie.getAllSeller(status);
-
-            res.status(200).json(seller);
-
+            const status = req.query.status;
+            const sellers = await SellerService.getAllSeller(status);
+            res.status(200).json(sellers);
         }catch(error){
-          res.status(error instanceof Error ? 404:500)
-          .json({message:error.message})
+            res.status(error instanceof Error ? 400 : 500).json({message:error.message});
         }
     }
+
     async updateSeller(req,res){
         try{
-            const existingSeller = await req.seller
-            const seller = await sellerServcie.updateSeller(existingSeller,req.body);
-
+            const existingSeller = req.seller;
+            const seller = await SellerService.updateSeller(existingSeller, req.body);
             res.status(200).json(seller);
-
         }catch(error){
-          res.status(error instanceof Error ? 404:500)
-          .json({message:error.message})
+            res.status(error instanceof Error ? 400 : 500).json({message:error.message});
         }
     }
-    async updateSeller(req,res){
+
+    async deleteSeller(req,res){
         try{
-            await sellerServcie.deleteSeller(req.params.id);
-
-            res.status(200).json({message:"seller deleted..."});
-
+            await SellerService.deleteSeller(req.params.id);
+            res.status(200).json({message:"Seller deleted"});
         }catch(error){
-          res.status(error instanceof Error ? 404:500)
-          .json({message:error.message})
+            res.status(error instanceof Error ? 400 : 500).json({message:error.message});
         }
     }
+
     async updateSellerAccountStatus(req,res){
         try{
-           const updatedSeller = await sellerServcie.updateSellerStatus(
-            req.params.id,
-            req.params.status
-           )
-         res.status(200).json(updatedSeller);
+            const updatedSeller = await SellerService.updateSellerStatus(req.params.id, req.params.status);
+            res.status(200).json(updatedSeller);
         }catch(error){
-          res.status(error instanceof Error ? 404:500)
-          .json({message:error.message})
+            res.status(error instanceof Error ? 400 : 500).json({message:error.message});
         }
     }
 
     async verifyLoginOtp(req,res){
         try{
-            const{otp,email} = req.body;
-            const seller = await sellerServcie.getSellerByEmail(email);
+            const {otp, email} = req.body;
+            const seller = await SellerService.getSellerByEmail(email);
 
-            const verificationCode = await verificationCode.findOne({email})
+            const codeEntry = await VerificationCode.findOne({email});
 
-            if(verificationCode || verificationCode.otp=otp){
-                throw new Error("Invalid OTP")
+            if(!codeEntry || codeEntry.otp !== otp){
+                throw new Error("Invalid OTP");
             }
 
             const token = jwtProvider.createJwt({email});
 
-            const authResponse={
-                message:"Login Success",
-                jwt:token,
-                role:UserRoles.SELLER
-            }
+            const authResponse = {
+                message: "Login Success",
+                jwt: token,
+                role: UserRole.SELLER
+            };
 
-            return res.status(200).json(authResponse)
+            return res.status(200).json(authResponse);
 
         }catch(error){
-           res.status(error instanceof Error ? 404 : 500)
-           .json({message:error.message})
+            res.status(error instanceof Error ? 400 : 500).json({message:error.message});
         }
     }
 }
+
+export default new SellerController();

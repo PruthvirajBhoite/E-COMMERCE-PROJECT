@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import UserRoles from "../domain/UserRole";
-import AccountStatus from "../domain/AccountStatus";
+import UserRoles from "../domain/UserRole.js";
+import AccountStatus from "../domain/AccountStatus.js";
 
 const sellerSchema = new mongoose.Schema({
     sellerName:{
@@ -77,5 +77,5 @@ const sellerSchema = new mongoose.Schema({
 
 const Seller = mongoose.model("Seller",sellerSchema);
 
-export default sellerSchema;
+export default Seller;
 

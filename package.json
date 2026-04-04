@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev" :"nodemon src/index.js",
-    "start":"node src/index.js"
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
   },
   "author": "pruthvi bhoite",
   "license": "ISC",
-  "type":"module",
+  "type": "module",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
@@ -20,6 +20,7 @@
     "express-validator": "^7.3.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.3.3",
+    "nodemailer": "^8.0.4",
     "nodemon": "^3.1.14"
   }
 }

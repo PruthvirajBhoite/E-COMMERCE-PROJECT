@@ -1,5 +1,5 @@
-import Seller from "../modal/seller.js"
-import jwtProvider from "../util/jwtProvider";
+import Seller from "../model/seller.js"
+import jwtProvider from "../util/jwtProvider.js";
 
 class SellerService{
 
@@ -16,7 +16,7 @@ class SellerService{
         saveAddress = await saveAddress.create(sellerData.pickupAddress);
 
         const newSeller = new Seller({
-           sellername:sellerData.name,
+           sellername:sellerData.sellername,
             email:sellerData.email,
             password:sellerData.password,
             pickupAddress:saveAddress._id,
@@ -72,4 +72,4 @@ class SellerService{
     }
 }
 
-module.exports = new SellerService();
+export default new SellerService();
