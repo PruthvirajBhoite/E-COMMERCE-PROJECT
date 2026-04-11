@@ -2,33 +2,33 @@ import mongoose from "mongoose";
 
 const ProductSchema = new mongoose.Schema({
     title:{
-        typeof:String,
+        type:String,
         required:true,
         trim:true
     },
     description:{
-        typeof:String,
+        type:String,
         required:true,
         trim:true
     },
     mrp:{
-        typeof:Number,
+        type:Number,
         required:true
     },
     sellingPrice:{
-        typeof:Number,
+        type:Number,
         required:true
     },
     discountPercent:{
-        typeof:Number,
+        type:Number,
         required:true
     },
     quantity:{
-        typeof:Number,
+        type:Number,
         required:true
     },
     color:{
-        typeof:Number,
+        type:Number,
         required:true
     },
     image:{

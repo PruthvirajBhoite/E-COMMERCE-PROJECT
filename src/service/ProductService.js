@@ -1,5 +1,8 @@
+import Category from "../model/Category.js";
+import Product from "../model/product.js";
 
-const calculateDiscountPrecentage(mrpPrice,sellingPrice)=>{
+
+export const calculateDiscountPrecentage = (mrpPrice,sellingPrice)=>{
     if(mrpPrice<=0){
         throw new Error("MRP Price should be greater then zero");
     }
@@ -28,7 +31,9 @@ class ProductService{
             sellingPrice:req.sellingPrice,
             mrpPrice:req.mrpPrice,
             discountPercent,
-            size:req.size,
+            size:req.sizes,
+            quantity:req.quantity,
+            color:req.color,
             seller:seller._id,
             categories:category3._id,
         });
@@ -45,7 +50,7 @@ class ProductService{
         if(!category){
             category = new Category({
                 categoryId,
-                level,
+                level:level,
                 parentId:parentId
             });
             category = await category.save();
@@ -97,5 +102,60 @@ class ProductService{
     async getProductsBySeller(sellerId){
         return await ProductService.find({seller:sellerId});
     }
-    
+
+    async getAllProducts(req){
+        const filterQuery={};
+
+        if(req.category){
+            const category = await Category.findOne({categoryId:req.category});
+
+            if(!category){
+                return {
+                    content : [],
+                    totalpages:0,
+                    totalElement:0
+                }
+            }
+            filterQuery.category =category._id.toString();
+        }
+        if(req.color){
+            filterQuery.color = req.color;
+        }
+
+        if(req.minPrice && req.maxPrice){
+            filterQuery.sellingPrice = {$gte:req.minPrice,$lte:req.maxPrice};
+        }
+
+        if(req.minDiscount){
+            filterQuery.discountPercent = {$gte:req.minDiscount};
+        }
+
+        if(req.size){
+            filterQuery.size = req.size;
+        }
+        let sortQuery = {};
+        if(req.sort==="price_low"){
+            sortQuery.sellingPrice = 1;
+        }else if(req.sort=="price_high"){
+            sortQuery.sellingPrice=-1;
+        }
+
+        const products = await ProductService.find(filterQuery)
+        .sort(sortQuery)
+        .skip(req.pageNumber * 10)
+        .limit(10);
+
+        const totalElement = await ProductService.countDocuments(filterQuery);
+
+        const tottalpages = Math.ceil(totalElement/10)
+
+        const res = {
+            content:products,
+            totalpages:totalpages,
+            totalElement:totalElement
+        }
+        return res;
+    }
 }
+
+export default new ProductService();
